@@ -1,0 +1,70 @@
+component rehome2 "Re-Home";
+
+pin in float x;
+pin in float y1;
+pin in float y2;
+pin in float z;
+
+pin in bit home_x;
+pin in bit home_y1;
+pin in bit home_y2;
+pin in bit home_z;
+
+
+function _;
+license "Yann";
+;;
+
+FUNCTION(_) {
+static bool _home_x = false;
+static bool _home_y1 = false;
+static bool _home_y2 = false;
+static bool _home_z = false;
+
+static float _x = 0;
+static float _y1 = 0;
+static float _y2 = 0;
+static float _z = 0;
+
+static float _hx = 0;
+static float _hy1 = 0;
+static float _hy2 = 0;
+static float _hz = 0;
+
+//static bool _changed = false;
+
+//static n = 0;
+//n++;
+
+if (_home_x == true && home_x == false)
+{
+  if (_x == 0) _x = x;
+  _hx = x;
+  rtapi_print_msg(RTAPI_MSG_ERR, "X abs %f rel %f", _hx, _x-_hx);
+}
+
+if (_home_y1 == true && home_y1 == false)
+{
+  if (_y1 == 0) _y1 = y1;
+  _hy1 = y1;
+  rtapi_print_msg(RTAPI_MSG_ERR, "Y1 abs %f rel %f", _hy1, _y1-_hy1);
+}
+if (_home_y2 == true && home_y2 == false)
+{
+  if (_y2 == 0) _y2 = y2;
+  _hy2 = y2;
+  rtapi_print_msg(RTAPI_MSG_ERR, "Y2 abs %f rel %f", _hy2, _y2-_hy2);
+}
+if (_home_z == true && home_z == false)
+{
+  if (_z == 0) _z = z;
+  _hz = z;
+  rtapi_print_msg(RTAPI_MSG_ERR, "Z abs %f rel %f", _hz, _z-_hz);
+}
+
+
+_home_x = home_x;
+_home_y1 = home_y1;
+_home_y2 = home_y2;
+_home_z = home_z;
+}

@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+
+
+import linuxcnc, hal, time, math, minimalmodbus
+
+vfd = hal.component("vfd")
+
+vfd.newpin("infreq",      hal.HAL_FLOAT, hal.HAL_IN)
+
+vfd.newpin("n",           hal.HAL_FLOAT, hal.HAL_OUT)
+vfd.newpin("lost",        hal.HAL_FLOAT, hal.HAL_OUT)
+vfd.newpin("outfreq",     hal.HAL_FLOAT, hal.HAL_OUT)
+vfd.newpin("outcurrent",  hal.HAL_FLOAT, hal.HAL_OUT)
+vfd.newpin("outvoltage",  hal.HAL_FLOAT, hal.HAL_OUT)
+vfd.newpin("temperature", hal.HAL_FLOAT, hal.HAL_OUT)
+vfd.newpin("stopped",     hal.HAL_BIT,   hal.HAL_OUT)
+vfd.newpin("running",     hal.HAL_BIT,   hal.HAL_OUT)
+
+
+vfd.ready()
+
+n = 0
+
+try:
+    while True:
+        vfd['outfreq']     = vfd['infreq']
+       
+       
+        n += 1
+
+        vfd['n'] = n
+
+        
+        vfd['stopped'] = (vfd['infreq'] == 0)
+        vfd['running'] = not vfd['stopped']
+        time.sleep(0.1)
+
+except KeyboardInterrupt:
+    raise SystemExit
+

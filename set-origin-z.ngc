@@ -1,0 +1,8 @@
+o<set-origin-z> sub
+O180 IF [#<_task> NE 1]
+ o<set-origin-z> return
+O180 ENDIF
+
+  G10 L2 P#<P> Z[#1312-#<Q>]
+
+o<set-origin-z> endsub

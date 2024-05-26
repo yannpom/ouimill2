@@ -1,0 +1,33 @@
+o<set-origin-xy-4-points-2> sub
+O180 IF [#<_task> NE 1]
+ o<set-origin-xy-4-points-2> return
+O180 ENDIF
+
+;  #1302 = 50
+
+;  #1300 = 15
+;  #1301 = 11
+;  M630
+
+;  #1300 = 15
+;  #1301 = -10
+;  M630
+
+;  #1300 = -15
+;  #1301 = -10
+;  M630
+
+;  #1300 = -15
+;  #1301 = 10
+;  M630
+
+  (compute center)
+  #<xc> = [ [#1310 + #1320 + #1330 + #1340] / 4 ]
+  #<yc> = [ [#1311 + #1321 + #1331 + #1341] / 4 ]
+
+  (debug, xc #<xc> yx #<yc>)
+  O187 IF [EXISTS[#<p>]]
+    G10 L2 P#<p> X#<xc> Y#<yc>
+  O187 ENDIF
+
+o<set-origin-xy-4-points-2> endsub

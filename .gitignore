@@ -1,0 +1,7 @@
+linuxcnc.var
+*.bak
+*.pyc
+tool.tbl
+autosave.halscope
+.DS_Store
+*.swp

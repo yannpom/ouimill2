@@ -1,0 +1,49 @@
+o<set-origin-2-points> sub
+O180 IF [#<_task> NE 1]
+ o<set-origin-2-points> return
+O180 ENDIF
+
+;  #1302 = 50
+
+;  #1300 = 15
+;  #1301 = 11
+;  M630
+
+;  #1300 = 15
+;  #1301 = -10
+;  M630
+
+;  #1300 = -15
+;  #1301 = -10
+;  M630
+
+;  #1300 = -15
+;  #1301 = 10
+;  M630
+
+  (compute center)
+  #<xc> = [ [#1310 + #1320] / 2 ]
+  #<yc> = [ [#1311 + #1321] / 2 ]
+  
+
+  #<p1x> = #1310
+  #<p1y> = #1311
+  #<p2x> = #1320
+  #<p2y> = #1321
+
+  (compute angle and size)
+  #<dx1> = [ #<p2x> - #<p1x> ]
+  #<dy1> = [ #<p2y> - #<p1y> ]
+  #<a1> = [ ATAN[-#<dx1>]/[#<dy1>] ]
+  #<l1> = SQRT[ #<dx1>**2 + #<dy1>**2 ]
+
+;  (debug, a1 #<a1>)
+
+  #<a1a> = [ [#<a1>+45] MOD 90 - 45]
+
+  (debug, a #<a1a> xc #<xc> yx #<yc>)
+  O187 IF [EXISTS[#<p>]]
+    G10 L2 P#<p> X#<xc> Y#<yc> R#<a1a>
+  O187 ENDIF
+
+o<set-origin-2-points> endsub

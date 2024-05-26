@@ -1,0 +1,87 @@
+o<set-origin-4corners> sub
+O180 IF [#<_task> NE 1]
+ o<set-origin-4corners> return
+O180 ENDIF
+
+#1302 = 50
+
+#1300 = 90
+#1301 = 100
+M630
+#1300 = 100
+#1301 = 90
+M630
+
+#1300 = 90
+#1301 = -100
+M630
+#1300 = 100
+#1301 = -90
+M630
+
+#1300 = -90
+#1301 = 100
+M630
+#1300 = -100
+#1301 = 90
+M630
+
+#1300 = -90
+#1301 = -100
+M630
+#1300 = -100
+#1301 = -90
+M630
+
+
+#<dx1> = [#1320 - #1310]
+#<dy1> = [#1321 - #1311]
+
+#<dx2> = [#1340 - #1330]
+#<dy2> = [#1341 - #1331]
+
+; center of first 2 points / should be horizontal
+#<xc1> = [ [#1310 + #1320] / 2 ]
+#<yc1> = [ [#1311 + #1321] / 2 ]
+
+; center of last 2 points / should be vertical
+#<xc2> = [ [#1330 + #1340] / 2 ]
+#<yc2> = [ [#1331 + #1341] / 2 ]
+
+; vector from "2 points center" to "2 points center"
+#<vx> = [ #<xc2> - #<xc1> ]
+#<vy> = [ #<yc2> - #<yc1> ]
+
+
+#<a1> = [ ATAN[-#<dx1>]/[#<dy1>] ]
+#<a2> = [ ATAN[-#<dx2>]/[#<dy2>] ]
+
+#<a1a> = [ [#<a1>+45] MOD 90 - 45 ]
+#<a2a> = [ [#<a2>+45] MOD 90 - 45 ]
+
+#<ea> = [ #<a2a> - #<a1a> ]
+(debug, squareness error #<ea>)
+
+#<a> = [ [ #<a1a> + #<a2a> ] / 2 ]
+(debug, a #<a>)
+
+#<lvx> = [ #<vx>*COS[-#<a>] - #<vy>*SIN[-#<a>] ]
+#<lvy> = [ #<vx>*SIN[-#<a>] + #<vy>*COS[-#<a>] ]
+(debug, lvx #<lvx> lvy #<lvy>)
+
+O188 IF [#<lvx> LT 0]
+#<nx> = [ #<xc1> + #<lvx> ]
+#<ny> = [ #<yc2> - #<lvy> ]
+O188 ELSE
+#<nx> = [ #<xc2> - #<lvx> ]
+#<ny> = [ #<yc1> + #<lvy> ]
+O188 ENDIF
+
+(debug, nx #<nx> ny #<ny>)
+
+
+O187 IF [EXISTS[#<p>]]
+    G10 L2 P#<p> X#<nx> Y#<ny> R#<a>
+O187 ENDIF
+
+o<set-origin-4corners> endsub

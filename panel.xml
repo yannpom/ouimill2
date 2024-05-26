@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pyvcp>
+         <vbox>
+         <relief>RIDGE</relief>         
+         <bd>6</bd>
+		<meter>
+			<halpin>"spindle-speed-cmd"</halpin>
+			<halpin2>"spindle-speed"</halpin2>
+		        <text>"Vitesse"</text>
+			<subtext>"tours / min"</subtext>
+			<size>250</size>
+			<min_>0</min_>
+			<max_>30000</max_>
+			<majorscale>5000</majorscale>
+			<minorscale>1000</minorscale>
+			<region1>(8000,30000,"green")</region1>
+		</meter>
+		<meter>
+			<halpin>"spindle-amps-max"</halpin>
+			<halpin2>"spindle-amps"</halpin2>
+		        <text>"Intensité"</text>
+			<subtext>"Ampères"</subtext>
+			<size>250</size>
+			<min_>0</min_>
+			<max_>6</max_>
+			<majorscale>1</majorscale>
+			<minorscale>0.25</minorscale>
+			<region1>(0,4,"green")</region1>
+			<region2>(4,5,"yellow")</region2>
+			<region3>(5,6,"red")</region3>
+		</meter>
+		<meter>
+			<halpin>"spindle-power-max"</halpin>
+			<halpin2>"spindle-power"</halpin2>
+		        <text>"Puissance"</text>
+		        <subtext>"Watts"</subtext>
+			<size>250</size>
+			<min_>0</min_>
+			<max_>2000</max_>
+			<majorscale>200</majorscale>
+			<minorscale>50</minorscale>
+			<region1>(0,1400,"green")</region1>
+			<region2>(1400,1700,"yellow")</region2>
+			<region3>(1700,2000,"red")</region3>
+		</meter>
+		<button>
+			<halpin>"reset-max"</halpin>
+			<text>"Effacer le max"</text>
+		</button>
+        </vbox>
+</pyvcp>
+

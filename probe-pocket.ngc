@@ -1,0 +1,147 @@
+o<probe-pocket> sub
+O180 IF [#<_task> NE 1]
+ o<probe-pocket> return
+O180 ENDIF
+
+  #<offset1> = -10.0   ; probe offset
+  #<offset2> = 10.0   ; x offset from y top
+
+  #<width> = #1
+  #<height> = #2
+  #<probe_z> = #3
+  #<z_up> = 10
+
+  #<safe_z> = 30
+
+  #<feed_high> = 600.0
+  #<feed_low>  =  60.0
+
+  M70
+  G90 
+  
+  (change tool and move above stock)
+  T30M6
+  o101 IF [#<_z> LT #<safe_z>]
+    G0 Z#<safe_z>
+  o101 ENDIF
+  G0 X0 Y0
+  G0 Z#<safe_z>
+
+  F#<feed_high>
+  G1 Z[#<z_up>+#<probe_z>]
+
+  G0 X0 Y[#<height>/2 + #<offset1>]
+
+  G91                                   ; probe 1
+  F#<feed_high>
+  G1 Z[-#<z_up>]
+  G38.2 Y[-2*#<offset1>]
+  G0 Y-1
+  F#<feed_low>
+  G38.2 Y2
+  #1011 = #5061
+  #1012 = #5062
+  G0 Y-2
+  G0 Z[#<z_up>]
+  G90
+
+  G0 X[#<width>/2+#<offset1>] Y[#1012-#<offset2>]
+
+  G91                                   ; probe 2
+  F#<feed_high>
+  G1 Z[-#<z_up>]
+  G38.2 X[-2*#<offset1>]
+  G0 X-1
+  F#<feed_low>
+  G38.2 X2
+  #1021 = #5061
+  #1022 = #5062
+  G0 X-2
+  G0 Z[#<z_up>]
+  G90
+
+  G0 X[#1021-#<width>-#<offset1>]
+
+  G91                                   ; probe 3
+  F#<feed_high>
+  G1 Z[-#<z_up>]
+  G38.2 X[2*#<offset1>]
+  G0 X1
+  F#<feed_low>
+  G38.2 X-2
+  #1031 = #5061
+  #1032 = #5062
+  G0 X2
+  G0 Z[#<z_up>]
+  G90
+
+  G0 X0 Y[#1012-#<height>-#<offset1>]
+
+  G91                                   ; probe 4
+  F#<feed_high>
+  G1 Z[-#<z_up>]
+  G38.2 Y[2*#<offset1>]
+  G0 Y1
+  F#<feed_low>
+  G38.2 Y-2
+  #1041 = #5061
+  #1042 = #5062
+  G0 Y2
+  G0 Z[#<z_up>]
+  G90
+
+  G0 X[#1021+#<offset1>] Y[#1042+#<offset2>]
+
+  G91                                   ; probe 5
+  F#<feed_high>
+  G1 Z[-#<z_up>]
+  G38.2 X[-2*#<offset1>]
+  G0 X-1
+  F#<feed_low>
+  G38.2 X2
+  #1051 = #5061
+  #1052 = #5062
+  G0 X-2
+  G0 Z[#<z_up>]
+  G90
+
+  G0 X[#1051-#<width>-#<offset1>]
+
+  G91                                   ; probe 6
+  F#<feed_high>
+  G1 Z[-#<z_up>]
+  G38.2 X[2*#<offset1>]
+  G0 X1
+  F#<feed_low>
+  G38.2 X-2
+  #1061 = #5061
+  #1062 = #5062
+  G0 X2
+  G0 Z[#<z_up>]
+  G90
+
+  #1101 = [[#1021 + #1031 + #1051 + #1061]/4]   ; x center
+  #1102 = [[#1012+#1042]/2]               ; y center
+  
+  G0 X[#1101] Y[#1102]
+
+  #1111 = [[#1021+#1031]/2 - [#1051+#1061]/2] ; dx
+  #1112 = [[#1022+#1032]/2 - [#1052+#1062]/2] ; dy
+  #1113 = [ATAN[-#1111]/[#1112]]       ; dr
+  #1114 = #[5210+20*#5220]            ; current r
+
+  M72
+
+  G10 L20 P0 X0 Y0 
+  G10 L2 P0 R[#1113+#1114]
+
+
+  #1200 = [[#1021-#1031+#1051-#1061]/2+3.175] ; width
+  #1201 = [#1012-#1042+3.175] ; height
+  #1202 = #[5201+20*#5220] ; offset x
+  #1203 = #[5202+20*#5220] ; offset y
+  #1204 = #[5210+20*#5220] ; r
+  (debug, w #1200 h #1201 x #1202 y #1203 r #1204) 
+  
+
+o<probe-pocket> endsub

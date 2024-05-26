@@ -1,0 +1,43 @@
+o<probe-x> sub
+O180 IF [#<_task> NE 1]
+ o<probe-x> return
+O180 ENDIF
+  #<retract_z> = #<R>
+  #<side> = #<I>
+  #<overtravel> = #<T>
+
+  #<feed_high> = 1000.0
+  #<feed_low>  =   60.0
+
+ (check if T30) 
+  M70
+  G90
+
+  o101 IF [#<_z> LT #<retract_z>]
+    G0 Z#<retract_z>
+  o101 ENDIF
+  G0 X#<X> Y#<Y>
+  G0 Z#<retract_z>
+
+  F#<feed_high>
+  G1 Z#<Z>
+
+  G91
+  G38.2 X[2*#<side>*#<overtravel>]
+  G1 X[-2*#<side>]
+  F#<feed_low>
+  G38.2 X[2*#<side>]
+  ;#1300 = [ #5061 + #5410/2*#<side> ]
+  #1300 = #5061
+  #1301 = #5062
+  #1302 = #5063
+  F#<feed_high>
+  G1 X[-2*#<side>]
+  G0 Z#<retract_z>
+  G90
+
+  M72
+
+  M630
+  
+o<probe-x> endsub

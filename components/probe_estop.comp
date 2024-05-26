@@ -1,0 +1,42 @@
+component probe_estop "E-Stop if unexpected probe";
+
+pin in float x;
+pin in float y;
+pin in float z;
+pin in bit probe;
+pin in float threshold;
+
+pin out bit estop;
+pin out bit estop_not;
+pin out float distance;
+
+function _;
+license "Yann";
+;;
+#include <rtapi_math.h>
+FUNCTION(_) {
+static float _x;
+static float _y;
+static float _z;
+
+if (!probe)
+{
+  _x = x;
+  _y = y;
+  _z = z;
+  estop = false;
+  distance = 0.0;
+}
+else
+{
+  float dx = _x - x;
+  float dy = _y - y;
+  float dz = _z - z;
+  distance = sqrt(dx*dx+dy*dy+dz*dz);
+  if (distance > threshold)
+  {
+    estop = true;
+  }
+}
+estop_not = !estop;
+}

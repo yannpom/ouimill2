@@ -1,0 +1,68 @@
+o<probe-circle> sub
+O180 IF [#<_task> NE 1]
+ o<probe-circle> return
+O180 ENDIF
+  #<retract_z> = #<R>
+
+  #<feed_high> = 1000.0
+  #<feed_low>  =   60.0
+
+ (check if T30) 
+
+  M70
+  G90
+
+  o101 IF [#<_z> LT #<retract_z>]
+    G0 Z#<retract_z>
+  o101 ENDIF
+  G0 X#<X> Y#<Y>
+  G0 Z#<retract_z>
+
+  F#<feed_high>
+  G38.3 Z#<Z>
+  (check no contact)
+
+  (measure X)
+  G91
+  G38.2 X[#<D>/2+10]
+  #<x1> = #5061
+  G90
+  G0 X#<X>
+  
+  G91
+  G38.2 X[-#<D>/2-10]
+  #<x2> = #5061
+  G90
+  G0 X#<X>
+  
+  (measure Y)
+  G91
+  G38.2 Y[#<D>/2+10]
+  #<y1> = #5062
+  G90
+  G0 Y#<Y>
+  
+  G91
+  G38.2 Y[-#<D>/2-10]
+  #<y2> = #5062
+  G90
+  G0 Y#<Y>
+
+  (average X)
+  #<avg_x> = [[#<x1>+#<x2>]/2]
+  #<avg_y> = [[#<y1>+#<y2>]/2]
+
+  #1300 = #<avg_x>
+  #1301 = #<avg_y>
+  #1302 = #<_z>
+
+  G90
+  G0 Z#<retract_z>
+
+  M72
+
+  M630
+  
+  (debug, x #1300 y #1301 z #1302) 
+  
+o<probe-circle> endsub

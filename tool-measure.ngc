@@ -1,0 +1,53 @@
+O<tool-measure> SUB
+O110 if [#<_current_tool> GT 0]
+O120 if [#<_task> EQ 1]
+
+#<ProbeX> =           132.0
+#<ProbeY> =          1406.6
+#<ProbeZ> =          -129.0
+#<ProbeStartHeight> =  80.0
+#<ProbeFeed1> =       600.0
+#<ProbeFeed2> =        30.0
+
+M70                                                  ( save current modal state )
+M64 P2
+
+M5                                                   ( arret broche )
+G90 G94 G40 G21
+G53 G0 Z0                                            ( remonte au max en Z )
+G10 L2 P9 X[#<ProbeX>] Y[#<ProbeY>] Z[#<ProbeZ>]     ( defini la position du bouton dans G59.3 )
+G59.3                                                ( selectionne le repère #9 )
+
+
+G0 X0 Y0                                             ( déplacement au dessus du bouton )
+G49                                                  ( desactive l'offset d'outil )
+G0 Z[#<ProbeStartHeight>]
+
+F[#<ProbeFeed1>]
+G38.2 Z0                                             ( probe )
+(debug, 1: #5063)
+G91
+G1 Z2
+F[#<ProbeFeed2>]
+G38.2 Z-2.5
+(debug, 2: #5063)
+G90
+F[#<ProbeFeed1>]
+G1 Z[#5063+2]
+
+G10 L11 P[#<_current_tool>] Z2                       ( set offset outil )
+
+G43                                                  ( recharge la table d'outil )
+
+G53 G0 Z0
+
+M65 P2
+M72                                                  ( restore modal state )
+G43
+
+O120 endif
+O110 else
+(MSG, Impossible de mesurer l'offset car aucun outil n'est actif )
+O110 endif
+O<tool-measure> ENDSUB
+M2

@@ -1,0 +1,29 @@
+component manual_auto "Four-input AND gate";
+
+pin in bit in;
+pin in bit in_button_up;
+pin in bit in_button_down;
+
+pin out bit mode_auto;
+pin out bit mode_manual;
+pin out bit mode_off;
+
+pin out bit out;
+
+function _ nofp;
+license "Yann";
+;;
+
+mode_manual =  in_button_up && !in_button_down;
+mode_auto   = !in_button_up && !in_button_down;
+mode_off    = !in_button_up &&  in_button_down;
+
+if (mode_off) {
+    out = false;
+}
+if (mode_manual) {
+    out = true;
+}
+if (mode_auto) {
+    out = in;
+}

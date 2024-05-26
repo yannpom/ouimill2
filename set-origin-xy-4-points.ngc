@@ -1,0 +1,138 @@
+o<set-origin-xy-4-points> sub
+O180 IF [#<_task> NE 1]
+ o<set-origin-xy-4-points> return
+O180 ENDIF
+
+;  #1302 = 50
+
+;  #1300 = 15
+;  #1301 = 11
+;  M630
+
+;  #1300 = 15
+;  #1301 = -10
+;  M630
+
+;  #1300 = -15
+;  #1301 = -10
+;  M630
+
+;  #1300 = -15
+;  #1301 = 10
+;  M630
+
+  (compute center)
+  #<xc> = [ [#1310 + #1320 + #1330 + #1340] / 4 ]
+  #<yc> = [ [#1311 + #1321 + #1331 + #1341] / 4 ]
+
+  (assign points to quadrants, p1 is upper-left, cw)
+  #<i> = 0
+  O186 while [#<i> LT 4]
+    #<px> = [ #[1310+10*#<i>] - #<xc> ]
+    #<py> = [ #[1311+10*#<i>] - #<yc>]
+    O182 IF [#<px> GT 0]
+      O183 IF [#<py> GT 0]
+        #<p2x> = #<px>
+        #<p2y> = #<py>
+      O183 ELSE
+        #<p3x> = #<px>
+        #<p3y> = #<py>
+      O183 ENDIF
+    O182 ELSE
+      O184 IF [#<py> GT 0]
+        #<p1x> = #<px>
+        #<p1y> = #<py>
+      O184 ELSE
+        #<p4x> = #<px>
+        #<p4y> = #<py>
+      O184 ENDIF
+    O182 ENDIF
+    #<i> = [#<i>+1]
+  O186 endwhile
+
+  O185 IF [[EXISTS[#<p1x>] + EXISTS[#<p2x>] + EXISTS[#<p3x>] + EXISTS[#<p4x>]] NE 4]
+    (abort, Cannot detect the 4 points)
+  O185 ENDIF
+
+
+  (compute angle and size)
+  #<dx1> = [ #<p2x> - #<p1x> ]
+  #<dy1> = [ #<p2y> - #<p1y> ]
+  #<a1> = [ ATAN[-#<dx1>]/[#<dy1>] ]
+  #<l1> = SQRT[ #<dx1>**2 + #<dy1>**2 ]
+
+  #<dx2> = [ #<p3x> - #<p2x> ]
+  #<dy2> = [ #<p3y> - #<p2y> ]
+  #<a2> = [ ATAN[-#<dx2>]/[#<dy2>] ]
+  #<l2> = SQRT[ #<dx2>**2 + #<dy2>**2 ]
+
+  #<dx3> = [ #<p4x> - #<p3x> ]
+  #<dy3> = [ #<p4y> - #<p3y> ]
+  #<a3> = [ ATAN[-#<dx3>]/[#<dy3>] ]
+  #<l3> = SQRT[ #<dx3>**2 + #<dy3>**2 ]
+
+  #<dx4> = [ #<p1x> - #<p4x> ]
+  #<dy4> = [ #<p1y> - #<p4y> ]
+  #<a4> = [ ATAN[-#<dx4>]/[#<dy4>] ]
+  #<l4> = SQRT[ #<dx4>**2 + #<dy4>**2 ]
+
+;  (debug, a1 #<a1> a2 #<a2> a3 #<a3> a4 #<a4>)
+
+  #<a1a> = [ [#<a1>+45] MOD 90 - 45]
+  #<a2a> = [ [#<a2>+45] MOD 90 - 45 ]
+  #<a3a> = [ [#<a3>+45] MOD 90 - 45 ]
+  #<a4a> = [ [#<a4>+45] MOD 90 - 45 ]
+
+;  (debug, a1a #<a1a> a2a #<a2a> a3a #<a3a> a4a #<a4a>)
+
+  #<a> = [ [#<a1a>*#<l1> + #<a2a>*#<l2> + #<a3a>*#<l3> + #<a4a>*#<l4>] / [#<l1>+#<l2>+#<l3>+#<l4>] ] ; angle moyen pondéré
+
+  #<w> = [ [#<l1>+#<l3>] / 2 ]
+  #<h> = [ [#<l2>+#<l4>] / 2 ]
+
+;  (debug, w #<w> h #<h> xc #<xc> yx #<yc> a #<a>)
+
+  ; compute max error
+
+
+  ; p1
+
+  #<tx> = [-#<w>/2]
+  #<ty> = [+#<h>/2]
+  #<cp1x> = [ #<tx>*COS[#<a>] - #<ty>*SIN[#<a>] ]
+  #<cp1y> = [ #<tx>*SIN[#<a>] + #<ty>*COS[#<a>] ]
+
+  #<tx> = [+#<w>/2]
+  #<ty> = [+#<h>/2]
+  #<cp2x> = [ #<tx>*COS[#<a>] - #<ty>*SIN[#<a>] ]
+  #<cp2y> = [ #<tx>*SIN[#<a>] + #<ty>*COS[#<a>] ]
+
+  #<tx> = [+#<w>/2]
+  #<ty> = [-#<h>/2]
+  #<cp3x> = [ #<tx>*COS[#<a>] - #<ty>*SIN[#<a>] ]
+  #<cp3y> = [ #<tx>*SIN[#<a>] + #<ty>*COS[#<a>] ]
+
+  #<tx> = [-#<w>/2]
+  #<ty> = [-#<h>/2]
+  #<cp4x> = [ #<tx>*COS[#<a>] - #<ty>*SIN[#<a>] ]
+  #<cp4y> = [ #<tx>*SIN[#<a>] + #<ty>*COS[#<a>] ]
+
+;  (debug, cp1 #<cp1x> #<cp1y>)
+;  (debug, cp2 #<cp2x> #<cp2y>)
+;  (debug, cp3 #<cp3x> #<cp3y>)
+;  (debug, cp4 #<cp4x> #<cp4y>)
+
+  #<de1> = SQRT[ [#<cp1x>-#<p1x>]**2 + [#<cp1y>-#<p1y>]**2 ]
+  #<de2> = SQRT[ [#<cp2x>-#<p2x>]**2 + [#<cp2y>-#<p2y>]**2 ]
+  #<de3> = SQRT[ [#<cp3x>-#<p3x>]**2 + [#<cp3y>-#<p3y>]**2 ]
+  #<de4> = SQRT[ [#<cp4x>-#<p4x>]**2 + [#<cp4y>-#<p4y>]**2 ]
+  #<de> = [ [#<de1>+#<de2>+#<de3>+#<de4>] / 4]
+
+  (debug, de #<de1> #<de2> #<de3> #<de4>)
+
+  (debug, w #<w> h #<h> a #<a> xc #<xc> yx #<yc> de #<de>)
+  O187 IF [EXISTS[#<p>]]
+    G10 L2 P#<p> X#<xc> Y#<yc> R#<a>
+  O187 ENDIF
+
+o<set-origin-xy-4-points> endsub

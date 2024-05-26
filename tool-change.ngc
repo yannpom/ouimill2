@@ -1,0 +1,190 @@
+O<tool-change> SUB
+O181 IF [#<_selected_tool> EQ #5400]
+  G43
+  O<tool-change> RETURN
+O181 ENDIF
+O180 IF [#<_task> EQ 1]
+  M5
+  M9
+  M70
+  G21
+  G30.1
+  G49
+  G90
+  G94
+  G40
+
+  M64 P2              ; extend Y 
+  G53 G0 Z0
+  M65 P3 ; retract probe
+
+  O<tool-unload> CALL
+  O<tool-load> CALL
+    
+  G53 G0 Z0
+; TODO TODO TODO
+;  M65 P2              ; unextend Y
+
+  O182 IF [#<_selected_tool> NE #5400]
+    G53 G0 Y1349
+    M66 P0 L0    ; block chain
+    (abort, Tool change error)
+  O182 ENDIF
+
+  G53 G0 Y1339
+
+  M72
+  G43
+O180 ENDIF
+O<tool-change> ENDSUB [1]
+
+O<tool-unload> SUB
+
+O130 IF [#5400 EQ 30] ; touch probe
+  M65 P3 ; retract probe
+  G4 P2 ; pause 
+  M61 Q0
+  O<tool-unload> RETURN
+O130 ENDIF
+#<tool_change_x>      =   132.0
+#<tool_change_dx>     =    55.0
+#<tool_change_y>      =  1406.6
+#<tool_change_z>      =  -175.9
+#<tool_change_z_safe> =  -120.0
+
+  M66 P0 L0         ; check if tool in spindle
+  O110 IF [#5399 EQ 0]
+    O111 IF [#<_current_tool> EQ 0] ; no tool in spindle
+      O<tool-unload> RETURN
+    O111 ELSE
+      (MSG, Asking to unload tool but there is already no tool in spindle)
+      M61 Q0
+      O<tool-unload> RETURN
+    O111 ENDIF
+  O110 ELSE        ; tool present in spindle
+    O112 IF [#<_current_tool> EQ 0]
+      (MSG, Cannot unload tool: I do not know which tool is in the spindle)
+      O<tool-unload> RETURN
+    O112 ENDIF
+  O110 ENDIF
+
+  G53 G0 Y[#<tool_change_y>] X[#<tool_change_x>+#<_current_tool>*#<tool_change_dx>]
+
+  (wait for spindle to stop)
+  M66 P2 L3 Q10
+  O115 IF [#5399 EQ -1] ; spindle did not stop
+    G53 Z0            ; safe Z
+    (MSG, Spindle did not stop after 10 seconds)
+    O<tool-unload> RETURN
+  O115 ENDIF
+
+  G53 G0 Z[#<tool_change_z>]
+
+  M64 P0            ; release tool
+  M66 P1 L4 Q2      ; wait for cylinder down
+  O113 IF [#5399 EQ -1]
+    M65 P0            ; grab tool
+    G53 Z0            ; safe Z
+    (MSG, Cannot actuate spindle cylinder. Missing air presure?)
+    O<tool-unload> RETURN
+  O113 ENDIF
+
+  M64 P1            ; clean taper
+  G53 G1 F180 Z[#<tool_change_z>+3]
+  M65 P1            ; stop cleaning taper
+
+  G53 G0 Z[#<tool_change_z>+20]
+
+  M65 P0            ;  cylinder up
+  M66 P1 L3 Q2      ; wait for cylinder up
+  O114 IF [#5399 EQ -1]
+    G53 Z0            ; safe Z
+    (MSG, Cannot actuate spindle cylinder. Missing air presure?)
+    O<tool-unload> RETURN
+  O114 ENDIF
+ 
+  M61 Q0
+
+  G53 G0 Z[#<tool_change_z_safe>]
+O<tool-unload> ENDSUB
+
+O<tool-load> SUB
+O131 IF [#<_selected_tool> EQ 30] ; touch probe
+  G53 G0 Z0
+  M64 P3 ; probe down
+  M61 Q30
+  O<tool-load> RETURN
+O131 ENDIF
+
+#<tool_change_x>      =   132.0
+#<tool_change_dx>     =    55.0
+#<tool_change_y>      =  1406.6
+#<tool_change_z>      =  -175.9
+#<tool_change_z_safe> =  -120.0
+
+  O120 IF [#<_selected_tool> EQ 0]
+    ; no tool to load
+    O<tool-load> RETURN
+  O120 ENDIF
+
+  M66 P0 L0         ; check if tool in spindle
+  O121 IF [#5399 EQ 1]
+    M61 Q0
+    (MSG, Cannot load tool. Tool already present in spindle.)
+    O<tool-load> RETURN
+  O121 ENDIF
+
+  G53 G0 Y[#<tool_change_y>] X[#<tool_change_x>+#<_selected_tool>*#<tool_change_dx>]
+
+
+  (wait for spindle to stop)
+  M66 P2 L3 Q10
+  O115 IF [#5399 EQ -1] ; spindle did not stop
+    G53 Z0            ; safe Z
+    (MSG, Spindle did not stop after 10 seconds)
+    O<tool-unload> RETURN
+  O115 ENDIF
+
+  G53 G0 Z[#<tool_change_z>+20]
+
+  M64 P0            ; cylinder down
+  M66 P1 L4 Q2      ; wait for cylinder down
+  O122 IF [#5399 EQ -1]
+    M65 P0
+    G53 G0 Z0       ;safe Z
+    (MSG, Cannot actuate spindle cylinder. Missing air pressure?)
+    O<tool-load> RETURN
+  O122 ENDIF
+
+  M64 P1            ; clean taper
+  G53 G0 Z[#<tool_change_z>+3]
+  G53 G1 F180 Z[#<tool_change_z>]
+  M65 P1            ; stop cleaning taper
+
+  G04 P0.2          ; wait 0.5 sec
+  M65 P0            ; cylinder up
+  M66 P1 L3 Q2      ; wait for cylinder up
+  O123 IF [#5399 EQ -1]
+    M64 P0          ; release tool
+    (MSG, Cannot grab tool. Spindle cylinder stuck.)
+    G53 Z0
+    M65 P0
+    M61 Q0
+    O<tool-load> RETURN
+  O123 ENDIF
+
+  G53 G0 Z[#<tool_change_z>+20]
+  M66 P0 L0         ; read tool in spindle pin
+  O124 IF [#5399 EQ 0]
+    (MSG, Cannot load tool. No tool in pocket!)
+    M61 Q0
+  O124 ELSE
+    M61 Q#<_selected_tool>
+  O124 ENDIF
+
+  G53 G0 Z0
+
+O<tool-load> ENDSUB
+
+
+M2

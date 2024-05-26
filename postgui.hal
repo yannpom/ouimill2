@@ -1,0 +1,21 @@
+
+loadrt mux2 names=mux2.extend-y
+addf mux2.extend-y servo-thread
+setp mux2.extend-y.in0 1340.0
+setp mux2.extend-y.in1 1408.0
+net extend_y motion.digital-out-02 => mux2.extend-y.sel
+net y-max-soft-limit mux2.extend-y.out => ini.y.max_limit
+
+#net probe-in => pyvcp.probe
+net spindle-actual-speed-rpm  => pyvcp.spindle-speed
+net spindle-cmd-speed-rpm     => pyvcp.spindle-speed-cmd
+net spindle-current => pyvcp.spindle-amps
+net spindle-current-max => pyvcp.spindle-amps-max
+net spindle-power => pyvcp.spindle-power
+net spindle-power-max => pyvcp.spindle-power-max
+#net spindle-at-speed => pyvcp.spindle-at-speed-led
+
+net reset-max <= pyvcp.reset-max
+net reset-max => minmax.0.reset
+net reset-max => minmax.1.reset
+
