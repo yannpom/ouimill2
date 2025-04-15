@@ -206,6 +206,38 @@ def find_corner_and_angle_from_3_points(points, probe_radius):
 
     return xc, yc, math.degrees(am)
 
+def find_center_angle_and_skew_from_4_points(points, probe_radius):
+    p1, p2, p3, p4 = points
+
+    l1 = [p1, p2]
+    l2 = [p2, p3]
+    l3 = [p3, p4]
+    l4 = [p4, p1]
+
+    as1 = angle_modulo_90deg(angle_two_lines(l1, l2))
+    as2 = angle_modulo_90deg(angle_two_lines(l2, l3))
+    as3 = angle_modulo_90deg(angle_two_lines(l3, l4))
+    as4 = angle_modulo_90deg(angle_two_lines(l4, l1))
+
+    a_skew = (as2+as4-as1-as3)/4.0
+    print("as1 %f as2 %f as3 %f as4 %f" % tuple(math.degrees(i) for i in (as1, as2, as3, as4)))
+    print("a_skew", math.degrees(a_skew))
+
+    a1 = angle_modulo_90deg(angle_line(l1))
+    a2 = angle_modulo_90deg(angle_line(l2))
+    a3 = angle_modulo_90deg(angle_line(l3))
+    a4 = angle_modulo_90deg(angle_line(l4))
+    print("a1 %f a2 %f a3 %f a4 %f" % tuple(math.degrees(i) for i in (a1, a2, a3, a4)))
+
+    a = (a1+a2+a3+a4)/4.0
+    print("a", math.degrees(a))
+
+    xc = (p1[0] + p2[0] + p3[0] + p4[0])/4.0
+    yc = (p1[1] + p2[1] + p3[1] + p4[1])/4.0
+
+    return xc, yc, math.degrees(a)
+     
+
 
 ######################################################################
 ######################################################################
@@ -221,11 +253,12 @@ if __name__ == "__main__":
     #find_corner_and_angle_from_3_points([[-1,10], [10,1], [100,10]], 3.175/2.0)
 
 
-    find_corner_and_angle_from_3_points([[0,10], [0,100], [-10,0]], 3.175/2.0)
+    # find_corner_and_angle_from_3_points([[0,10], [0,100], [-10,0]], 3.175/2.0)
 
     #find_corner_and_angle_from_3_points([[100,50+10], [100-10,50+100], [100-10,50]], 3.175/2.0)
 
-
+    ret = find_center_angle_and_skew_from_4_points([[-21,40], [19,40], [19,-40], [-21, -40]], 3.175/2.0)
+    print(ret)
 
 
 

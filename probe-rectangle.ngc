@@ -4,7 +4,7 @@ O180 IF [#<_task> NE 1]
 O180 ENDIF
 
   #<offset1> = 20.0   ; probe offset
-  #<offset2> = 30.0   ; x offset from y top
+  #<offset2> = 5.0   ; x offset from y top
 
   #<width> = #1
   #<height> = #2

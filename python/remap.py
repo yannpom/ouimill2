@@ -7,11 +7,21 @@ throw_exceptions = 1
 import geometry
 
 
+# def m650(self, **words):
+#     if not self.task: return INTERP_OK
+#     points = read_last_n_points(self, 8)
+#     probe_radius = float(self.params[5410]) / 2.0
+#     xc, yc, a, a_skew = geometry.find_centrer_angle_and_skew_from_4_corners(points, probe_radius)
+#     cmd = "G10 L2 P0 X%f Y%f R%f" % (xc, yc, get_new_angle_same_quadrant(self, a))
+#     print("cmd", cmd)
+#     self.execute(cmd)
+#     return INTERP_OK
+
 def m650(self, **words):
     if not self.task: return INTERP_OK
-    points = read_last_n_points(self, 8)
+    points = read_last_n_points(self, 4)
     probe_radius = float(self.params[5410]) / 2.0
-    xc, yc, a, a_skew = geometry.find_centrer_angle_and_skew_from_4_corners(points, probe_radius)
+    xc, yc, a, a_skew = geometry.find_center_angle_and_skew_from_4_points(points, probe_radius)
     cmd = "G10 L2 P0 X%f Y%f R%f" % (xc, yc, get_new_angle_same_quadrant(self, a))
     print("cmd", cmd)
     self.execute(cmd)
